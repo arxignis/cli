@@ -1,0 +1,62 @@
+---
+https_redirect: true
+target: test.target.example.com
+hsts_enabled: true
+ssl: full
+url_normalization: true
+rewrite:
+- name: test
+  path: "/testredirect"
+  target: https://ax.target.example.com
+  code: 301
+  enabled: true
+ratelimit:
+  - name: "auth_login"
+    rule: (http.request.uri.path contains "/auth/login")
+    type: fixed_window
+    enabled: true
+    limit: 100
+    period: 60
+    burst: 100
+  - name: "auth_register"
+    rule: (http.request.uri.path contains "/auth/register")
+    type: leaky_bucket
+    enabled: true
+    limit: 100
+    period: 60
+    burst: 100
+waf:
+- name: test
+  action: block
+  rule: (ip.src.country eq "FR" and http.request.headers[*].user_agent contains "curl")
+  enabled: true
+yara:
+- name: test
+  action: log
+  rule: |
+    rule BlockBadHostAndUserAgent {
+        condition:
+            http_request_method == "GET" and
+            http_request_headers_user_agent contains "curl"
+    }
+  enabled: true
+av_scan:
+  - uri: "/*"
+    enabled: true
+transformation:
+  request_headers:
+  - name: content-type
+    action: remove
+    enabled: true
+  - name: user-agent
+    action: set
+    value: this_is_a_test_user_agent
+    enabled: true
+  response_headers:
+  - name: content-type
+    action: remove
+    enabled: true
+  - name: user-agent
+    action: set
+    value: this_is_a_test_response_header
+    enabled: true

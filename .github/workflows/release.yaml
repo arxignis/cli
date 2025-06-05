@@ -1,0 +1,63 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build_release:
+    name: build_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: set version
+        run: sed -i 's/{{version}}/${{ github.ref_name }}/g' main.ts
+      - name: build
+        run: deno task build-linux
+      - name: version
+        run: echo "::set-output name=version::$(./dist/ax --version)"
+        id: version
+      - name: build artifacts
+        run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload linux artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.linux-amd64.tar.gz
+          asset_name: ax.linux-amd64.tar.gz
+          asset_content_type: application/gzip
+      - name: upload darwin artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.darwin-amd64.tar.gz
+          asset_name: ax.darwin-amd64.tar.gz
+          asset_content_type: application/gzip
+      - name: upload windows artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.windows-amd64.zip
+          asset_name: ax.windows-amd64.zip
+          asset_content_type: application/zip
