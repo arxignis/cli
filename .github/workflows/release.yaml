@@ -24,7 +24,7 @@ jobs:
       - name: build
         run: deno task build-linux
       - name: version
-        run: echo "::set-output name=version::$(./dist/ax --version)"
+        run: echo "version=$(dist/ax-linux-amd64 --version)" >> $GITHUB_OUTPUT
         id: version
       - name: build artifacts
         run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
