@@ -28,12 +28,16 @@ jobs:
         id: version
       - name: build artifacts
         run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
-      - name: compress artifacts
+      - name: compress and hash artifacts
         run: |
           tar -czvf dist/ax.linux-amd64.tar.gz dist/ax-linux-amd64
+          sha256sum dist/ax.linux-amd64.tar.gz > dist/ax.linux-amd64.tar.gz.sha256
           tar -czvf dist/ax.linux-arm64.tar.gz dist/ax-linux-arm64
+          sha256sum dist/ax.linux-arm64.tar.gz > dist/ax.linux-arm64.tar.gz.sha256
           zip dist/ax.windows-amd64.zip dist/ax-windows-amd64.exe
+          sha256sum dist/ax.windows-amd64.zip > dist/ax.windows-amd64.zip.sha256
           tar -czvf dist/ax.darwin-amd64.tar.gz dist/ax-darwin-amd64
+          sha256sum dist/ax.darwin-amd64.tar.gz > dist/ax.darwin-amd64.tar.gz.sha256
       - name: release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -52,6 +56,33 @@ jobs:
           asset_path: ./dist/ax.linux-amd64.tar.gz
           asset_name: ax.linux-amd64.tar.gz
           asset_content_type: application/gzip
+      - name: upload linux hash artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.linux-amd64.tar.gz.sha256
+          asset_name: ax.linux-amd64.tar.gz.sha256
+          asset_content_type: text/plain
+      - name: upload linux-arm64 artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.linux-arm64.tar.gz
+          asset_name: ax.linux-arm64.tar.gz
+          asset_content_type: application/gzip
+      - name: upload linux-arm64 hash artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.linux-arm64.tar.gz.sha256
+          asset_name: ax.linux-arm64.tar.gz.sha256
+          asset_content_type: text/plain
       - name: upload darwin artifact
         uses: shogo82148/actions-upload-release-asset@v1
         env:
@@ -61,6 +92,15 @@ jobs:
           asset_path: ./dist/ax.darwin-amd64.tar.gz
           asset_name: ax.darwin-amd64.tar.gz
           asset_content_type: application/gzip
+      - name: upload darwin hash artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.darwin-amd64.tar.gz.sha256
+          asset_name: ax.darwin-amd64.tar.gz.sha256
+          asset_content_type: text/plain
       - name: upload windows artifact
         uses: shogo82148/actions-upload-release-asset@v1
         env:
@@ -70,3 +110,12 @@ jobs:
           asset_path: ./dist/ax.windows-amd64.zip
           asset_name: ax.windows-amd64.zip
           asset_content_type: application/zip
+      - name: upload windows hash artifact
+        uses: shogo82148/actions-upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ax.windows-amd64.zip.sha256
+          asset_name: ax.windows-amd64.zip.sha256
+          asset_content_type: text/plain
