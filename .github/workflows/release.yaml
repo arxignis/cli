@@ -11,9 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
       - name: set version
         run: sed -i 's/{{version}}/${{ github.ref_name }}/g' main.ts
       - name: build
@@ -24,16 +27,15 @@ jobs:
       - name: build artifacts
         run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
       - name: release
-        uses: actions/create-release@v1
         id: create_release
+        uses: comnoco/create-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
       - name: upload linux artifact
         uses: shogo82148/actions-upload-release-asset@v1
         env:
