@@ -19,6 +19,8 @@ jobs:
           deno-version: v2.x
       - name: set version
         run: sed -i 's/{{version}}/${{ github.ref_name }}/g' main.ts
+      - name: create dist directory
+        run: mkdir -p dist
       - name: build
         run: deno task build-linux
       - name: version
@@ -26,6 +28,12 @@ jobs:
         id: version
       - name: build artifacts
         run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
+      - name: compress artifacts
+        run: |
+          tar -czvf dist/ax.linux-amd64.tar.gz dist/ax-linux-amd64
+          tar -czvf dist/ax.linux-arm64.tar.gz dist/ax-linux-arm64
+          zip dist/ax.windows-amd64.zip dist/ax-windows-amd64.exe
+          tar -czvf dist/ax.darwin-amd64.tar.gz dist/ax-darwin-amd64
       - name: release
         id: create_release
         uses: softprops/action-gh-release@v2
