@@ -26,6 +26,8 @@ jobs:
       - name: version
         run: echo "version=$(dist/ax-linux-amd64 --version)" >> $GITHUB_OUTPUT
         id: version
+      - name: create dist directory
+        run: mkdir -p dist
       - name: build artifacts
         run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
       - name: compress and hash artifacts

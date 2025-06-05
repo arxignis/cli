@@ -4,7 +4,7 @@
     "build-linux": "deno compile --target x86_64-unknown-linux-gnu --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-linux-amd64 main.ts",
     "build-linux-arm64": "deno compile --target aarch64-unknown-linux-gnu --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-linux-arm64 main.ts",
     "build-windows": "deno compile --target x86_64-pc-windows-msvc --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-windows-amd64.exe main.ts",
-    "build-darwin": "deno compile --target aarch64-apple-darwin --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-darwin-amd64 main.ts",
+    "build-darwin": "deno compile --target aarch64-apple-darwin --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-darwin-arm64 main.ts",
     "test": "deno test --unstable --allow-write --allow-read"
   },
   "imports": {
