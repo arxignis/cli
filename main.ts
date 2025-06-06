@@ -1,3 +1,4 @@
+/// <reference lib="deno.unstable" />
 import { Command } from "jsr:@cliffy/command@^1.0.0-rc.7";
 import { Input, Secret, Confirm } from "jsr:@cliffy/prompt@^1.0.0-rc.7";
 import { Table } from "jsr:@cliffy/table@^1.0.0-rc.7";
@@ -27,7 +28,7 @@ const plainConfig = {
   yara: [],
 };
 
-const CLI_API_URL = Deno.env.get('CLI_API_URL') || 'https://api.arxignis.com/v1';
+const CLI_API_URL = Deno.env.get('CLI_API_URL') || 'https://api.arxignis.com';
 const CLI_SIGNUP_URL = Deno.env.get('CLI_SIGNUP_URL') || 'https://dash.arxignis.com/auth/signup';
 
 const generateConfig = (domain: string) => {
@@ -113,7 +114,13 @@ const renderSitesTable = (sites: Site[]) => {
   const headers = ['ID', 'Domain', 'Status', 'Created At', 'Updated At'];
   new Table()
     .header(headers)
-    .body(sites.map((site: Site) => [site.id, site.domain, site.status, site.createdAt, site.updatedAt]))
+    .body(sites.map((site: Site) => [
+      site.id,
+      site.domain,
+      site.status,
+      site.createdAt,
+      site.updatedAt
+    ] as string[]))
     .maxColWidth(30)
     .padding(1)
     .indent(2)
@@ -161,8 +168,8 @@ const siteCommand = new Command().command(
 ).command(
   'create',
   new Command().description('Create a new site')
-  .option('-d, --domain <domain:string>', 'Domain name', { required: false })
-  .action(async (options: { domain?: string }) => {
+  .option('-d, --domain <domain:string>', 'Domain name', { required: true })
+  .action(async (options: { domain: string }) => {
     if (!options.domain) {
       const domain = await Input.prompt('Enter the domain name');
       options.domain = domain;
@@ -321,7 +328,7 @@ await new Command()
   .description('Manage site settings')
   .option('-d, --domain <domain:string>', 'Domain name', { required: true })
   .option('-c, --config <path:string>', 'Config file path', { required: true })
-  .action(async (options) => {
+  .action(async (options: { domain: string, config: string }) => {
     try {
       const config = await Deno.readTextFile(options.config);
       const parsedConfig = parse(config);
