@@ -38,8 +38,8 @@ jobs:
           sha256sum dist/ax.linux-arm64.tar.gz > dist/ax.linux-arm64.tar.gz.sha256
           zip dist/ax.windows-amd64.zip dist/ax-windows-amd64.exe
           sha256sum dist/ax.windows-amd64.zip > dist/ax.windows-amd64.zip.sha256
-          tar -czvf dist/ax.darwin-amd64.tar.gz dist/ax-darwin-amd64
-          sha256sum dist/ax.darwin-amd64.tar.gz > dist/ax.darwin-amd64.tar.gz.sha256
+          tar -czvf dist/ax.darwin-arm64.tar.gz dist/ax-darwin-arm64
+          sha256sum dist/ax.darwin-arm64.tar.gz > dist/ax.darwin-arm64.tar.gz.sha256
       - name: release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -91,8 +91,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/ax.darwin-amd64.tar.gz
-          asset_name: ax.darwin-amd64.tar.gz
+          asset_path: ./dist/ax.darwin-arm64.tar.gz
+          asset_name: ax.darwin-arm64.tar.gz
           asset_content_type: application/gzip
       - name: upload darwin hash artifact
         uses: shogo82148/actions-upload-release-asset@v1
@@ -100,8 +100,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/ax.darwin-amd64.tar.gz.sha256
-          asset_name: ax.darwin-amd64.tar.gz.sha256
+          asset_path: ./dist/ax.darwin-arm64.tar.gz.sha256
+          asset_name: ax.darwin-arm64.tar.gz.sha256
           asset_content_type: text/plain
       - name: upload windows artifact
         uses: shogo82148/actions-upload-release-asset@v1
