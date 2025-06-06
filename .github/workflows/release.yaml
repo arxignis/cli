@@ -32,10 +32,11 @@ jobs:
         run: deno task build-linux && deno task build-linux-arm64 && deno task build-windows && deno task build-darwin
       - name: compress and hash artifacts
         run: |
-          tar -czvf dist/ax.linux-amd64.tar.gz dist/ax-linux-amd64
-          tar -czvf dist/ax.linux-arm64.tar.gz dist/ax-linux-arm64
-          zip dist/ax.windows-amd64.zip dist/ax-windows-amd64.exe
-          tar -czvf dist/ax.darwin-arm64.tar.gz dist/ax-darwin-arm64
+          cd dist
+          tar -czvf ax.linux-amd64.tar.gz ax-linux-amd64
+          tar -czvf ax.linux-arm64.tar.gz ax-linux-arm64
+          zip ax.windows-amd64.zip ax-windows-amd64.exe
+          tar -czvf ax.darwin-arm64.tar.gz ax-darwin-arm64
       - name: release
         id: create_release
         uses: softprops/action-gh-release@v2
