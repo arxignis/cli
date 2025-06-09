@@ -102,6 +102,8 @@ https_redirect: false
 target: example.com
 hsts_enabled: false
 ssl: flexible
+rate_limit: []
+upload_limit: []
 av_scan: []
 transformation:
   request_headers: []
@@ -110,6 +112,7 @@ rewrite: []
 waf: []
 yara: []
 ```
+[Check example config](./example/example_com.yaml)
 
 ## Development
 

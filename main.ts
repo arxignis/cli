@@ -21,7 +21,7 @@ const plainConfig = {
   ssl: 'flexible',
   av_scan: [],
   upload_limit: [],
-  ratelimit: [],
+  rate_limit: [],
   transformation: {
     request_headers: [],
     response_headers: [],

@@ -15,7 +15,7 @@ upload_limit:
     rule: (http.request.uri.path contains "/testupload")
     size: 100 # in megabytes
     enabled: true
-ratelimit:
+rate_limit:
   - name: "auth_login"
     rule: (http.request.uri.path contains "/auth/login")
     type: fixed_window
