@@ -77,6 +77,17 @@ This will:
 ./ax site create
 ```
 
+### Cache Management
+
+#### Purge Cache
+```bash
+# Purge a specific URL from the cache
+./ax purge url-purge -d example.com -u https://example.com/path
+
+# Purge all URLs from the cache for a domain
+./ax purge all -d example.com
+```
+
 ### Managing Settings
 
 Update site settings using a YAML configuration file:
