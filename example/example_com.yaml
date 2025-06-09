@@ -5,11 +5,16 @@ hsts_enabled: true
 ssl: full
 url_normalization: true
 rewrite:
-- name: test
-  path: "/testredirect"
-  target: https://ax.target.example.com
-  code: 301
-  enabled: true
+  - name: test
+    path: "/testredirect"
+    target: https://ax.target.example.com
+    code: 301
+    enabled: true
+upload_limit:
+  - name: "test"
+    rule: (http.request.uri.path contains "/testupload")
+    size: 100 # in megabytes
+    enabled: true
 ratelimit:
   - name: "auth_login"
     rule: (http.request.uri.path contains "/auth/login")
@@ -41,7 +46,8 @@ yara:
     }
   enabled: true
 av_scan:
-  - uri: "/*"
+  - name: test_av_scan
+    rule: (http.request.uri.path starts_with "/")
     enabled: true
 transformation:
   request_headers:

@@ -2,6 +2,7 @@
   "version": "0.1.0",
   "tasks": {
     "version": "git describe --tags --abbrev=0",
+    "dev": "deno run --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --watch main.ts",
     "compile": "deno compile --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax main.ts",
     "build-linux": "deno compile --target x86_64-unknown-linux-gnu --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-linux-amd64 main.ts",
     "build-linux-arm64": "deno compile --target aarch64-unknown-linux-gnu --allow-run --allow-read --allow-env --allow-net --allow-write --unstable-kv --output ./dist/ax-linux-arm64 main.ts",

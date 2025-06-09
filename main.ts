@@ -17,8 +17,11 @@ const plainConfig = {
   https_redirect: false,
   target: 'placeholder',
   hsts_enabled: false,
+  url_normalization: false,
   ssl: 'flexible',
   av_scan: [],
+  upload_limit: [],
+  ratelimit: [],
   transformation: {
     request_headers: [],
     response_headers: [],
@@ -92,6 +95,7 @@ const httpRequest = async (url: string, method: string, headers: Record<string, 
 const loginTest = async (token: string) => {
   const response = await httpRequest(`${CLI_API_URL}/v1/sites`, 'GET', {
     'Authorization': `Bearer ${token}`,
+    'User-Agent': 'Arxignis CLI {{version}}',
   }, '');
   if (!response.ok) {
     console.error('Login failed');
@@ -136,6 +140,7 @@ const fetchSites = async (token: string, domain?: string) => {
   try {
     const response = await httpRequest(url, 'GET', {
       'Authorization': `Bearer ${token}`,
+      'User-Agent': 'Arxignis CLI {{version}}',
     }, '');
 
     const data = await response.json();
@@ -178,10 +183,41 @@ const siteCommand = new Command().command(
     const response = await httpRequest(`${CLI_API_URL}/v1/sites/${options.domain}`, 'POST', {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
+      'User-Agent': 'Arxignis CLI {{version}}',
     }, JSON.stringify({ domain: options.domain }));
     return response.body;
   })
 );
+
+const purgeCommand = new Command().command(
+  'url-purge',
+  new Command().description('Purge a specific URL from the cache')
+  .option('-d, --domain <domain:string>', 'Domain name', { required: true })
+  .option('-u, --url <url:string>', 'URL to purge', { required: true })
+  .action(async (options: { domain: string, url: string }) => {
+    const token = await getLoginToken();
+    const response = await httpRequest(`${CLI_API_URL}/v1/sites/${options.domain}/purge`, 'POST', {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'Arxignis CLI {{version}}',
+    }, JSON.stringify({ type: 'url', url: options.url }));
+    return response.body;
+  })
+  .command(
+    'all',
+    new Command().description('Purge all URLs from the cache')
+    .option('-d, --domain <domain:string>', 'Domain name', { required: true })
+    .action(async (options: { domain: string }) => {
+      const token = await getLoginToken();
+      const response = await httpRequest(`${CLI_API_URL}/v1/sites/${options.domain}/purge`, 'POST', {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'Arxignis CLI {{version}}',
+      }, JSON.stringify({ type: 'all' }));
+      return response.body;
+    })
+  )
+)
 
 const getLoginToken = async () => {
   const kv = await Deno.openKv(`${kvPath}/cache.db`);
@@ -338,10 +374,16 @@ await new Command()
         Deno.exit(1);
       }
       const token = await getLoginToken();
-      const response = await httpRequest(`${CLI_API_URL}/v1/site/settings/${options.domain}`, 'POST', {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }, JSON.stringify(parsedConfig));
+      const response = await httpRequest(
+        `${CLI_API_URL}/v1/site/settings/${options.domain}`,
+        'POST',
+        {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'Arxignis CLI {{version}}',
+        },
+        JSON.stringify(parsedConfig)
+      );
       console.log(await response.json());
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
@@ -354,4 +396,6 @@ await new Command()
       Deno.exit(1);
     }
   })
+  .command('purge', purgeCommand)
+  .description('Purge cache')
   .parse(Deno.args);
